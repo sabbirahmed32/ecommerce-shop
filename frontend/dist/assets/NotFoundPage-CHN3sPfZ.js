@@ -1,0 +1,6 @@
+import{c as o,j as e,L as t}from"./index-6Vaa7jlb.js";import{B as a}from"./Button-otFPUHSK.js";/**
+ * @license lucide-react v0.469.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const s=o("Compass",[["path",{d:"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z",key:"9ktpf1"}],["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}]]);function c(){return e.jsxs("div",{className:"container-page flex flex-col items-center py-24 text-center",children:[e.jsx("p",{className:"bg-gradient-to-r from-brand-600 to-violet-500 bg-clip-text text-8xl font-extrabold text-transparent",children:"404"}),e.jsx("h1",{className:"mt-4 text-2xl font-extrabold tracking-tight text-zinc-900",children:"Page not found"}),e.jsx("p",{className:"mt-2 max-w-sm text-zinc-500",children:"The page you're looking for doesn't exist or has been moved."}),e.jsxs("div",{className:"mt-8 flex gap-3",children:[e.jsx(t,{to:"/",children:e.jsx(a,{variant:"primary",icon:s,children:"Back to Home"})}),e.jsx(t,{to:"/shop",children:e.jsx(a,{variant:"secondary",children:"Browse Shop"})})]})]})}export{c as default};
