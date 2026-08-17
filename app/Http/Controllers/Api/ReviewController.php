@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReviewRequest;
 use App\Http\Resources\ReviewResource;
 use App\Http\Traits\ApiResponse;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\JsonResponse;
@@ -18,11 +19,13 @@ class ReviewController extends Controller
     public function index(Product $product): JsonResponse
     {
         $reviews = $product->reviews()
+            ->approved()
             ->with('user')
             ->orderByDesc('created_at')
             ->get();
 
-        $ratingCounts = $reviews->groupBy('rating')
+        $allReviews = $product->reviews()->get();
+        $ratingCounts = $allReviews->groupBy('rating')
             ->map(fn ($group) => $group->count())
             ->toArray();
 
@@ -56,16 +59,31 @@ class ReviewController extends Controller
             return $this->error('You have already reviewed this product.', 422);
         }
 
-        $review = DB::transaction(function () use ($request, $product): Review {
+        $orderId = $request->input('order_id');
+        if ($orderId) {
+            $hasOrder = Order::where('id', $orderId)
+                ->where('user_id', $request->user()->id)
+                ->where('status', 'delivered')
+                ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
+                ->exists();
+
+            if (! $hasOrder) {
+                return $this->error('You can only review products from delivered orders.', 422);
+            }
+        }
+
+        $review = DB::transaction(function () use ($request, $product, $orderId): Review {
             $review = Review::create([
                 'user_id' => $request->user()->id,
                 'product_id' => $product->id,
+                'order_id' => $orderId,
                 'rating' => $request->rating,
                 'comment' => $request->comment,
+                'status' => Review::STATUS_APPROVED,
             ]);
 
-            $avg = $product->reviews()->avg('rating');
-            $count = $product->reviews()->count();
+            $avg = $product->reviews()->approved()->avg('rating');
+            $count = $product->reviews()->approved()->count();
 
             $product->update([
                 'rating_avg' => round((float) $avg, 2),

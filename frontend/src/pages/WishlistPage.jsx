@@ -94,6 +94,9 @@ export default function WishlistPage() {
                         <span className="text-xs text-zinc-400 line-through">{formatPrice(product.compare_price)}</span>
                       )}
                     </div>
+                    <span className={`text-xs font-semibold ${product.in_stock ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {product.in_stock ? 'In Stock' : 'Out of Stock'}
+                    </span>
                   </div>
                   <button
                     onClick={() => addToCart(product)}

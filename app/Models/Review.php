@@ -8,14 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReviewFactory> */
     use HasFactory;
+
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [
         'user_id',
         'product_id',
+        'order_id',
         'rating',
         'comment',
+        'status',
     ];
 
     protected $casts = [
@@ -30,5 +35,20 @@ class Review extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', self::STATUS_APPROVED);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
     }
 }

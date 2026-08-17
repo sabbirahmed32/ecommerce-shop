@@ -34,6 +34,7 @@ export function timeAgo(value) {
 
 export const ORDER_STATUS_STYLES = {
   pending: { label: 'Pending', className: 'bg-amber-50 text-amber-700 ring-amber-200' },
+  confirmed: { label: 'Confirmed', className: 'bg-indigo-50 text-indigo-700 ring-indigo-200' },
   processing: { label: 'Processing', className: 'bg-blue-50 text-blue-700 ring-blue-200' },
   shipped: { label: 'Shipped', className: 'bg-violet-50 text-violet-700 ring-violet-200' },
   delivered: { label: 'Delivered', className: 'bg-emerald-50 text-emerald-700 ring-emerald-200' },
@@ -41,11 +42,15 @@ export const ORDER_STATUS_STYLES = {
 };
 
 export const PAYMENT_STATUS_STYLES = {
+  pending: { label: 'Pending', className: 'bg-amber-50 text-amber-700 ring-amber-200' },
   paid: { label: 'Paid', className: 'bg-emerald-50 text-emerald-700 ring-emerald-200' },
-  unpaid: { label: 'Unpaid', className: 'bg-zinc-100 text-zinc-600 ring-zinc-200' },
+  failed: { label: 'Failed', className: 'bg-red-50 text-red-700 ring-red-200' },
+  refunded: { label: 'Refunded', className: 'bg-blue-50 text-blue-700 ring-blue-200' },
 };
 
-export const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+export const PAYMENT_STATUSES = ['pending', 'paid', 'failed', 'refunded'];
+
+export const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 export function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });

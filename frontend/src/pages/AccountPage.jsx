@@ -289,7 +289,7 @@ function OrdersTab() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
-                <Link to={`/account?tab=orders`} className="text-sm font-semibold text-brand-600 hover:text-brand-800">
+                <Link to={`/orders/${order.id}`} className="text-sm font-semibold text-brand-600 hover:text-brand-800">
                   View details
                 </Link>
                 {order.can_cancel && (

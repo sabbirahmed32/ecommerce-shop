@@ -43,6 +43,13 @@ class OrderResource extends JsonResource
                 'quantity' => $item->quantity,
                 'total' => $item->total,
             ])),
+            'user' => $this->whenLoaded('user', fn () => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+                'phone' => $this->user->phone,
+                'is_blocked' => $this->user->is_blocked ?? false,
+            ]),
             'created_at' => $this->created_at,
             'created_at_human' => $this->created_at?->diffForHumans(),
         ];

@@ -21,6 +21,7 @@ class CategoryRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', Rule::unique('categories', 'slug')->ignore($categoryId)],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'string', 'max:500'],
+            'status' => ['boolean'],
         ];
     }
 }

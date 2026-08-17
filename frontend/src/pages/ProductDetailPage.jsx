@@ -561,11 +561,13 @@ function ReviewsSection({ product }) {
     setSubmitting(true);
     try {
       const { data } = await productApi.submitReview(product.id, { rating, comment });
-      setReviews((prev) => [data.data.review, ...prev]);
       setComment('');
       setRating(5);
-      toast.success('Thanks! Your review has been posted.');
-      productApi.reviews(product.id).then(({ data }) => setSummary(data.data.summary)).catch(() => {});
+      toast.success('Thanks! Your review has been submitted and will appear after approval.');
+      productApi.reviews(product.id).then(({ data }) => {
+        setReviews(data.data.reviews);
+        setSummary(data.data.summary);
+      }).catch(() => {});
     } catch (err) {
       toast.error(extractError(err));
     } finally {

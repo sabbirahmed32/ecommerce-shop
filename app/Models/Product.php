@@ -10,20 +10,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
     protected $fillable = [
         'category_id',
+        'brand_id',
         'brand',
         'name',
         'slug',
         'description',
+        'short_description',
         'specifications',
         'colors',
         'sizes',
         'price',
         'compare_price',
+        'discount_price',
         'stock',
         'sku',
         'image',
@@ -32,11 +34,14 @@ class Product extends Model
         'status',
         'rating_avg',
         'rating_count',
+        'meta_title',
+        'meta_description',
     ];
 
     protected $casts = [
         'price' => 'float',
         'compare_price' => 'float',
+        'discount_price' => 'float',
         'images' => 'array',
         'specifications' => 'array',
         'colors' => 'array',
@@ -52,6 +57,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function brandRel(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function reviews(): HasMany
@@ -81,7 +91,7 @@ class Product extends Model
 
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
-        if (!$term) {
+        if (! $term) {
             return $query;
         }
 
@@ -94,7 +104,7 @@ class Product extends Model
 
     public function scopeByCategory(Builder $query, ?string $slug): Builder
     {
-        if (!$slug) {
+        if (! $slug) {
             return $query;
         }
 
@@ -103,7 +113,7 @@ class Product extends Model
 
     public function scopeByBrand(Builder $query, ?string $brand): Builder
     {
-        if (!$brand) {
+        if (! $brand) {
             return $query;
         }
 
@@ -112,7 +122,7 @@ class Product extends Model
 
     public function scopeMinRating(Builder $query, ?string $rating): Builder
     {
-        if (!$rating) {
+        if (! $rating) {
             return $query;
         }
 

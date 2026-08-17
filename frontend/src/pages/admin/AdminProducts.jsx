@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Package, Filter } from 'lucide-react';
 import { adminApi } from '../../api';
 import { extractError } from '../../api/client';
 import { useToastStore } from '../../stores/toastStore';
@@ -16,17 +16,31 @@ export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterBrand, setFilterBrand] = useState('');
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    adminApi.allCategories().then(({ data }) => setCategories(data.data.categories)).catch(() => {});
+    adminApi.allBrands().then(({ data }) => setBrands(data.data.brands)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     let active = true;
     setLoading(true);
     adminApi
-      .products({ search: search || undefined, page })
+      .products({
+        search: search || undefined,
+        category_id: filterCategory || undefined,
+        brand_id: filterBrand || undefined,
+        page,
+      })
       .then(({ data }) => {
         if (!active) return;
         setProducts(data.data.products);
@@ -35,7 +49,7 @@ export default function AdminProducts() {
       .catch((err) => toast.error(extractError(err)))
       .finally(() => active && setLoading(false));
     return () => (active = false);
-  }, [search, page]);
+  }, [search, filterCategory, filterBrand, page]);
 
   const runSearch = (e) => {
     e.preventDefault();
@@ -47,14 +61,17 @@ export default function AdminProducts() {
     try {
       const { data } = await adminApi.updateProduct(product.id, {
         category_id: product.category_id,
+        brand_id: product.brand_id,
         name: product.name,
         slug: product.slug,
         description: product.description,
         price: product.price,
         compare_price: product.compare_price,
+        discount_price: product.discount_price,
         stock: product.stock,
         sku: product.sku,
         image: product.image,
+        images: product.images,
         featured: product.featured,
         status: !product.status,
       });
@@ -79,6 +96,16 @@ export default function AdminProducts() {
     }
   };
 
+  const clearFilters = () => {
+    setSearch('');
+    setSearchInput('');
+    setFilterCategory('');
+    setFilterBrand('');
+    setPage(1);
+  };
+
+  const hasFilters = search || filterCategory || filterBrand;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -91,15 +118,39 @@ export default function AdminProducts() {
         </Link>
       </div>
 
-      <form onSubmit={runSearch} className="relative max-w-sm">
-        <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
-        <input
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search products…"
-          className="w-full rounded-full border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-        />
-      </form>
+      <div className="card space-y-3 p-4">
+        <form onSubmit={runSearch} className="flex gap-3">
+          <div className="relative flex-1">
+            <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search products…"
+              className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            />
+          </div>
+          <select
+            value={filterCategory}
+            onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }}
+            className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          >
+            <option value="">All categories</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <select
+            value={filterBrand}
+            onChange={(e) => { setFilterBrand(e.target.value); setPage(1); }}
+            className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          >
+            <option value="">All brands</option>
+            {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+          <Button type="submit" variant="primary">Search</Button>
+          {hasFilters && (
+            <Button type="button" variant="secondary" icon={Filter} onClick={clearFilters}>Clear</Button>
+          )}
+        </form>
+      </div>
 
       {loading ? (
         <div className="flex justify-center py-20"><Spinner /></div>
@@ -113,6 +164,7 @@ export default function AdminProducts() {
                 <tr className="border-b border-zinc-100 bg-zinc-50/60 text-xs uppercase tracking-wider text-zinc-500">
                   <th className="px-6 py-3 font-semibold">Product</th>
                   <th className="px-6 py-3 font-semibold">Category</th>
+                  <th className="px-6 py-3 font-semibold">Brand</th>
                   <th className="px-6 py-3 font-semibold">Price</th>
                   <th className="px-6 py-3 font-semibold">Stock</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
@@ -132,7 +184,14 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-6 py-3 text-zinc-600">{p.category?.name}</td>
-                    <td className="px-6 py-3 font-semibold text-zinc-900">{formatPrice(p.price)}</td>
+                    <td className="px-6 py-3 text-zinc-600">{p.brandRel?.name || p.brand || '—'}</td>
+                    <td className="px-6 py-3">
+                      <div>
+                        <span className="font-semibold text-zinc-900">{formatPrice(p.price)}</span>
+                        {p.discount_price && <span className="ml-1 text-xs text-green-600">Sale: {formatPrice(p.discount_price)}</span>}
+                        {p.compare_price > p.price && <span className="ml-1 text-xs text-zinc-400 line-through">{formatPrice(p.compare_price)}</span>}
+                      </div>
+                    </td>
                     <td className="px-6 py-3">
                       <span className={`text-sm font-medium ${p.stock === 0 ? 'text-red-500' : p.stock <= 5 ? 'text-amber-600' : 'text-zinc-600'}`}>{p.stock}</span>
                     </td>

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -16,9 +15,11 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'status',
     ];
 
     protected $casts = [
+        'status' => 'boolean',
         'products_count' => 'integer',
     ];
 
@@ -29,6 +30,6 @@ class Category extends Model
 
     public function scopeActive($query)
     {
-        return $query->whereHas('products', fn ($q) => $q->where('status', true));
+        return $query->where('status', true);
     }
 }

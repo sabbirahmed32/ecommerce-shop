@@ -16,17 +16,22 @@ class OrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Order::with('items')->with('user:id,name,email');
+        $query = Order::with('items')->with('user:id,name,email,phone');
 
         if ($request->filled('status')) {
             $query->where('status', $request->query('status'));
         }
 
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->query('payment_status'));
+        }
+
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('order_number', 'like', '%' . $request->query('search') . '%')
-                    ->orWhere('shipping_name', 'like', '%' . $request->query('search') . '%')
-                    ->orWhere('shipping_email', 'like', '%' . $request->query('search') . '%');
+                $search = $request->query('search');
+                $q->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('shipping_name', 'like', "%{$search}%")
+                    ->orWhere('shipping_email', 'like', "%{$search}%");
             });
         }
 
@@ -55,6 +60,7 @@ class OrderController extends Controller
         $request->validate([
             'status' => ['required', 'string', Rule::in([
                 Order::STATUS_PENDING,
+                Order::STATUS_CONFIRMED,
                 Order::STATUS_PROCESSING,
                 Order::STATUS_SHIPPED,
                 Order::STATUS_DELIVERED,
@@ -69,7 +75,25 @@ class OrderController extends Controller
         $order->update(['status' => $request->status]);
 
         return $this->success([
-            'order' => new OrderResource($order->fresh()->load('items')),
+            'order' => new OrderResource($order->fresh()->load('items', 'user')),
         ], 'Order status updated.');
+    }
+
+    public function updatePaymentStatus(Request $request, Order $order): JsonResponse
+    {
+        $request->validate([
+            'payment_status' => ['required', 'string', Rule::in([
+                Order::PAYMENT_PENDING,
+                Order::PAYMENT_PAID,
+                Order::PAYMENT_FAILED,
+                Order::PAYMENT_REFUNDED,
+            ])],
+        ]);
+
+        $order->update(['payment_status' => $request->payment_status]);
+
+        return $this->success([
+            'order' => new OrderResource($order->fresh()->load('items', 'user')),
+        ], 'Payment status updated.');
     }
 }

@@ -225,7 +225,7 @@ export default function Navbar() {
                       <MenuItem to="/account" icon={<User size={16} />} onClick={() => setUserMenu(false)}>
                         My Account
                       </MenuItem>
-                      <MenuItem to="/account?tab=orders" icon={<Package size={16} />} onClick={() => setUserMenu(false)}>
+                      <MenuItem to="/orders" icon={<Package size={16} />} onClick={() => setUserMenu(false)}>
                         My Orders
                       </MenuItem>
                       {user.is_admin && (

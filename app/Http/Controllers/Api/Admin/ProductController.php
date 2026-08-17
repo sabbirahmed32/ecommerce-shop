@@ -17,7 +17,7 @@ class ProductController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with('category');
+        $query = Product::with(['category', 'brandRel']);
 
         if ($request->filled('search')) {
             $query->search($request->query('search'));
@@ -25,6 +25,10 @@ class ProductController extends Controller
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->query('category_id'));
+        }
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->query('brand_id'));
         }
 
         if ($request->filled('status')) {
@@ -52,14 +56,14 @@ class ProductController extends Controller
         ]);
 
         return $this->success([
-            'product' => new ProductResource($product->load('category')),
+            'product' => new ProductResource($product->load(['category', 'brandRel'])),
         ], 'Product created successfully.', 201);
     }
 
     public function show(Product $product): JsonResponse
     {
         return $this->success([
-            'product' => new ProductResource($product->load('category')),
+            'product' => new ProductResource($product->load(['category', 'brandRel'])),
         ]);
     }
 
@@ -74,7 +78,7 @@ class ProductController extends Controller
         $product->update($data);
 
         return $this->success([
-            'product' => new ProductResource($product->fresh()->load('category')),
+            'product' => new ProductResource($product->fresh()->load(['category', 'brandRel'])),
         ], 'Product updated successfully.');
     }
 

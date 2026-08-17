@@ -61,7 +61,7 @@ export default function OrderSuccessPage() {
         )}
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/account?tab=orders">
+          <Link to="/orders">
             <Button variant="primary">View My Orders</Button>
           </Link>
           <Link to="/">

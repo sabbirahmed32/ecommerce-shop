@@ -13,6 +13,7 @@ class Coupon extends Model
         'code',
         'type',
         'value',
+        'max_discount',
         'min_subtotal',
         'max_uses',
         'used_count',
@@ -23,6 +24,7 @@ class Coupon extends Model
 
     protected $casts = [
         'value' => 'float',
+        'max_discount' => 'float',
         'min_subtotal' => 'float',
         'max_uses' => 'integer',
         'used_count' => 'integer',
@@ -36,6 +38,10 @@ class Coupon extends Model
         $discount = $this->type === self::TYPE_PERCENT
             ? $subtotal * ($this->value / 100)
             : $this->value;
+
+        if ($this->max_discount && $discount > $this->max_discount) {
+            $discount = $this->max_discount;
+        }
 
         return round(min($discount, $subtotal), 2);
     }

@@ -57,7 +57,8 @@ export const adminApi = {
   createProduct: (data) => client.post('/admin/products', data),
   updateProduct: (id, data) => client.put(`/admin/products/${id}`, data),
   deleteProduct: (id) => client.delete(`/admin/products/${id}`),
-  categories: () => client.get('/admin/categories'),
+  categories: (params) => client.get('/admin/categories', { params }),
+  allCategories: () => client.get('/admin/categories/all'),
   category: (id) => client.get(`/admin/categories/${id}`),
   createCategory: (data) => client.post('/admin/categories', data),
   updateCategory: (id, data) => client.put(`/admin/categories/${id}`, data),
@@ -65,4 +66,29 @@ export const adminApi = {
   orders: (params) => client.get('/admin/orders', { params }),
   order: (id) => client.get(`/admin/orders/${id}`),
   updateOrderStatus: (id, status) => client.patch(`/admin/orders/${id}/status`, { status }),
+  updateOrderPaymentStatus: (id, paymentStatus) => client.patch(`/admin/orders/${id}/payment-status`, { payment_status: paymentStatus }),
+  customers: (params) => client.get('/admin/customers', { params }),
+  customer: (id) => client.get(`/admin/customers/${id}`),
+  blockCustomer: (id) => client.patch(`/admin/customers/${id}/block`),
+  deleteCustomer: (id) => client.delete(`/admin/customers/${id}`),
+  coupons: (params) => client.get('/admin/coupons', { params }),
+  createCoupon: (data) => client.post('/admin/coupons', data),
+  updateCoupon: (id, data) => client.put(`/admin/coupons/${id}`, data),
+  deleteCoupon: (id) => client.delete(`/admin/coupons/${id}`),
+  reviews: (params) => client.get('/admin/reviews', { params }),
+  updateReviewStatus: (id, status) => client.patch(`/admin/reviews/${id}/status`, { status }),
+  deleteReview: (id) => client.delete(`/admin/reviews/${id}`),
+  brands: (params) => client.get('/admin/brands', { params }),
+  allBrands: () => client.get('/admin/brands/all'),
+  brand: (id) => client.get(`/admin/brands/${id}`),
+  createBrand: (data) => client.post('/admin/brands', data),
+  updateBrand: (id, data) => client.put(`/admin/brands/${id}`, data),
+  deleteBrand: (id) => client.delete(`/admin/brands/${id}`),
+  uploadImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return client.post('/admin/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
